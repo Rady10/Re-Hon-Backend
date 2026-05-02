@@ -12,11 +12,13 @@ const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGO_DB_URL;
 
 if (!MONGODB_URI) {
-  console.error('MONGO_DB_URL is not defined. Please check your Vercel Environment Variables.');
+  console.error('MONGO_DB_URL is not defined in .env');
+  process.exit(1);
 }
 
 
 const app = express();
+
 
 app.use(express.json());
 app.use(authRoutes);
@@ -25,25 +27,16 @@ app.use(bookRoutes);
 app.use(cartRoutes);
 app.use(wishlistRoutes);
 
-// Connect to MongoDB without exiting the process on failure
+
 mongoose
-    .connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
-        maxPoolSize: 10,
-    })
-    .then(() => {
-        console.log('Database Connected!');
+    .connect(MONGODB_URI)
+    .then(result => {
+        console.log('Database Connected!')
     })
     .catch(err => {
-        console.error('Database connection error:', err);
+        console.log(err);
     });
 
-// Only listen if not running as a serverless function (Vercel sets VERCEL=1)
-if (process.env.VERCEL !== '1') {
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Connected At Port ${PORT}`);
-    });
-}
-
-module.exports = app;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Connected At Port ${PORT}`);
+});
