@@ -11,6 +11,12 @@ const wishlistRoutes = require('./routes/wishlist');
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGO_DB_URL;
 
+if (!MONGODB_URI) {
+  console.error('MONGO_DB_URL is not defined in .env');
+  process.exit(1);
+}
+
+
 const app = express();
 
 
