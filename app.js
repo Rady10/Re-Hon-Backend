@@ -8,17 +8,18 @@ const bookRoutes = require('./routes/book');
 const cartRoutes = require('./routes/cart');
 const wishlistRoutes = require('./routes/wishlist');
 
-const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGO_DB_URL;
-
-if (!MONGODB_URI) {
-  console.error('MONGO_DB_URL is not defined in .env');
-  process.exit(1);
-}
-
 
 const app = express();
 
+let connected = false;
+app.use(async (req, res, next) => {
+  if (!connected) {
+    await mongoose.connect(MONGODB_URI);
+    connected = true;
+  }
+  next();
+});
 
 app.use(express.json());
 app.use(authRoutes);
@@ -27,16 +28,9 @@ app.use(bookRoutes);
 app.use(cartRoutes);
 app.use(wishlistRoutes);
 
+if (process.env.VERCEL !== '1') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, '0.0.0.0', () => console.log(`Connected At Port ${PORT}`));
+}
 
-mongoose
-    .connect(MONGODB_URI)
-    .then(result => {
-        console.log('Database Connected!')
-    })
-    .catch(err => {
-        console.log(err);
-    });
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Connected At Port ${PORT}`);
-});
+module.exports = app;

@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
             .status(401)
             .json({ msg: "Token verification failed, authorization denied." });
     
-        req.user = verified.id;
+        req.user = verified._id;
         req.token = token;
         next();
       } catch (err) {
