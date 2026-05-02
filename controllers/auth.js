@@ -70,7 +70,7 @@ exports.tokenHandler = async (req, res) => {
     const verified = jwt.verify(token, JWT_SECRET);
     if (!verified) return res.json(false);
 
-    const user = await User.findById(verified._id);
+    const user = await User.findById(verified.id);
     if (!user) return res.json(false);
     res.json(true);
   } catch (e) {
